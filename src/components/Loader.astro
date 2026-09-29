@@ -10,22 +10,26 @@ const steps = [
   'Preparando a batalha...',
   'Vila concluída.',
 ];
+const digitStrip = Array.from({ length: 10 }, (_, i) => i);
 ---
-<div class="loader" id="loader" role="status" aria-live="polite" data-steps={JSON.stringify(steps)}>
-  <video
-    class="loader__video"
-    src="/videos/loading.mp4"
-    autoplay
-    muted
-    playsinline
-    preload="auto"
-    aria-hidden="true"
-  ></video>
+<div class="loader" id="loader" data-steps={JSON.stringify(steps)}>
+  <div class="loader__scene" aria-hidden="true">
+    <video
+      class="loader__video"
+      src="/videos/loading.mp4"
+      autoplay
+      muted
+      playsinline
+      preload="auto"
+    ></video>
+  </div>
 
   <Logo class="loader__logo" />
 
   <div class="loader__bottom">
-    <p class="loader__copy"><span class="loader__copy-text">{steps[0]}</span></p>
+    <p class="loader__copy" aria-hidden="true"></p>
+    <p class="loader__status visually-hidden" role="status" aria-live="polite">{steps[0]}</p>
+
     <div class="loader__row">
       <div
         class="loader__bar"
@@ -36,8 +40,21 @@ const steps = [
         aria-valuenow="0"
       >
         <div class="loader__fill"></div>
+        <span class="loader__tip" aria-hidden="true"></span>
       </div>
-      <span class="loader__pct">0%</span>
+
+      <span class="loader__pct" aria-hidden="true">
+        {['h', 't', 'u'].map((place) => (
+          <span class:list={['digit', { 'is-hidden': place !== 'u' }]}>
+            <span class="digit__strip">
+              {digitStrip.map((d) => <span>{d}</span>)}
+            </span>
+          </span>
+        ))}
+        <span>%</span>
+      </span>
+
+      <canvas class="loader__sparks" aria-hidden="true"></canvas>
     </div>
   </div>
 </div>
@@ -49,10 +66,14 @@ const steps = [
     z-index: 100;
     overflow: hidden;
     background: var(--black);
+    perspective: 900px;
+  }
+  .loader__scene {
+    position: absolute;
+    inset: -4%;
+    will-change: transform;
   }
   .loader__video {
-    position: absolute;
-    inset: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
@@ -60,54 +81,140 @@ const steps = [
   :global(.loader__logo) {
     position: absolute;
     top: 24px;
-    left: 50%;
-    transform: translateX(-50%);
+    left: 0;
+    right: 0;
+    margin-inline: auto;
   }
+
   .loader__bottom {
     position: absolute;
-    left: 50%;
+    left: 0;
+    right: 0;
     bottom: clamp(40px, 9vh, 72px);
     width: min(641px, calc(100% - 2 * var(--gutter)));
-    transform: translateX(-50%);
+    margin-inline: auto;
     display: flex;
     flex-direction: column;
     gap: 24px;
+    transform-style: preserve-3d;
+    will-change: transform;
   }
+
+  /* Copy: every letter is its own 3D block, with the game's outline and extrusion. */
   .loader__copy {
     margin: 0;
-    height: 1.2em;
-    overflow: hidden;
+    min-height: 1.2em;
     font-family: var(--font-display);
-    font-size: clamp(24px, 3.4vw, 40px);
+    font-size: clamp(26px, 3.6vw, 44px);
     line-height: 1.2;
     text-align: center;
+    perspective: 600px;
   }
-  .loader__copy-text { display: inline-block; }
+  .loader__copy :global(.word) { display: inline-block; white-space: nowrap; }
+  .loader__copy :global(.char) {
+    display: inline-block;
+    transform-origin: 50% 100%;
+    -webkit-text-stroke: 0.09em #1b1308;
+    paint-order: stroke fill;
+    text-shadow:
+      0 0.04em 0 #1b1308,
+      0 0.08em 0 #1b1308,
+      0 0.12em 0 #1b1308,
+      0 0.2em 0.3em rgba(0, 0, 0, 0.45);
+  }
+  .loader__copy.is-final :global(.char) { color: var(--gold-100); }
+
   .loader__row {
     position: relative;
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 16px;
   }
+
+  /* Bar: a chunky, bevelled tube with animated stripes. */
   .loader__bar {
+    position: relative;
     flex: 1;
-    height: 24px;
+    height: 28px;
+    padding: 3px;
     border-radius: 100px;
-    background: var(--white-10);
+    background: rgba(0, 0, 0, 0.35);
+    box-shadow:
+      inset 0 3px 6px rgba(0, 0, 0, 0.55),
+      inset 0 -1px 0 rgba(255, 255, 255, 0.12),
+      0 0 0 2px rgba(255, 255, 255, 0.1),
+      0 10px 24px rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(6px);
   }
   .loader__fill {
     height: 100%;
     border-radius: inherit;
-    background: linear-gradient(to left, var(--gold-500), var(--gold-100));
+    background:
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.6) 0 22%, transparent 48%, rgba(150, 80, 0, 0.35) 100%),
+      repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.22) 0 8px, transparent 8px 16px),
+      linear-gradient(to left, var(--gold-500), var(--gold-100));
+    background-size: 100% 100%, 22.6px 100%, 100% 100%;
     clip-path: inset(0 100% 0 0 round 100px);
+    animation: stripes 0.6s linear infinite;
   }
+  @keyframes stripes {
+    to { background-position: 0 0, 22.6px 0, 0 0; }
+  }
+  .loader__tip {
+    position: absolute;
+    top: 50%;
+    left: 3px;
+    width: 44px;
+    height: 44px;
+    margin: -22px 0 0 -22px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #fff 0 10%, rgba(255, 226, 140, 0.8) 28%, rgba(255, 191, 0, 0) 68%);
+    mix-blend-mode: screen;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* Rolling odometer digits. */
   .loader__pct {
-    min-width: 2.6em;
+    display: flex;
+    justify-content: flex-end;
+    min-width: 3.4em;
+    height: 1.2em;
     font-family: var(--font-display);
-    font-size: clamp(22px, 2.6vw, 32px);
+    font-size: clamp(24px, 2.8vw, 34px);
     line-height: 1.2;
-    text-align: right;
-    font-variant-numeric: tabular-nums;
+    -webkit-text-stroke: 0.08em #1b1308;
+    paint-order: stroke fill;
+    text-shadow: 0 0.08em 0 #1b1308;
+  }
+  .digit {
+    display: inline-block;
+    width: 0.62em;
+    height: 1.2em;
+    overflow: hidden;
+    transition: width 0.3s ease;
+  }
+  .digit.is-hidden { width: 0; }
+  .digit__strip {
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.25);
+  }
+  .digit__strip > span { height: 1.2em; text-align: center; }
+
+  .loader__sparks {
+    position: absolute;
+    left: -40px;
+    top: -140px;
+    width: calc(100% + 80px);
+    height: calc(100% + 180px);
+    pointer-events: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .loader__fill { animation: none; }
+    .loader__sparks, .loader__tip { display: none; }
+    .digit__strip { transition: none; }
   }
 </style>
 

@@ -1,0 +1,228 @@
+---
+import Logo from './Logo.astro';
+
+const links = [
+  { label: 'Home', href: '#inicio', current: true },
+  { label: 'O Jogo', href: '#gameplay' },
+  { label: 'Como Jogar', href: '#como-jogar' },
+  { label: 'Heróis', href: '#herois' },
+  { label: 'FAQ', href: '#faq' },
+];
+---
+<section class="hero" id="inicio">
+  <!-- Placeholder: swap for the hero's own background video when it's ready. -->
+  <video
+    class="hero__video"
+    src="/videos/loading.mp4"
+    muted
+    loop
+    playsinline
+    preload="none"
+    aria-hidden="true"
+  ></video>
+  <div class="hero__overlay" aria-hidden="true"></div>
+
+  <header class="hero__nav" data-hero-in>
+    <a href="#inicio" aria-label="Clash of Clans — início"><Logo /></a>
+
+    <nav class="pill-nav" aria-label="Principal">
+      {links.map((link) => (
+        <a
+          class:list={['pill-nav__link', { 'is-current': link.current }]}
+          href={link.href}
+          aria-current={link.current ? 'page' : undefined}
+        >
+          {link.label}
+        </a>
+      ))}
+    </nav>
+
+    <div class="hero__actions">
+      <a class="btn btn--ghost btn--sm hero__login" href="#">Fazer login</a>
+      <a class="btn btn--light btn--sm" href="#download">Jogar agora</a>
+    </div>
+  </header>
+
+  <div class="hero__content">
+    <div class="hero__headline">
+      <p class="hero__hat" data-hero-in>CONSTRUA. ATAQUE. CONQUISTE.</p>
+      <h1 class="hero__title" data-hero-in>Construa seu reino E Lidere seu clã</h1>
+    </div>
+
+    <div class="hero__side">
+      <div class="hero__ctas" data-hero-in>
+        <a class="btn btn--gold hero__cta-main" href="#download">
+          Jogar grátis
+          <span class="btn__icon"><img src="/images/icon-game.svg" alt="" width="16.6667" height="16.6667" /></span>
+        </a>
+        <a class="btn btn--ghost" href="#trailer">
+          Assistir ao trailer
+          <img class="btn__icon" src="/images/icon-play.svg" alt="" width="20" height="20" />
+        </a>
+      </div>
+      <p class="hero__desc" data-hero-in>
+        Erga uma vila imbatível, forme um exército lendário e enfrente jogadores do mundo inteiro em batalhas épicas. Sua história começa agora, Chefe.
+      </p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    min-height: 100svh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 24px var(--gutter) clamp(40px, 8vh, 80px);
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .hero__video {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .hero__overlay {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background:
+      linear-gradient(to top, rgba(0, 0, 0, 0.75), transparent 55%),
+      linear-gradient(to bottom, rgba(0, 0, 0, 0.45), transparent 25%),
+      var(--white-05);
+  }
+
+  /* Nav */
+  .hero__nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    width: 100%;
+    max-width: 1104px;
+    margin: 0 auto;
+  }
+  .pill-nav {
+    display: flex;
+    align-items: center;
+    padding: 4px;
+    border: 1px solid var(--white-10);
+    border-radius: 100px;
+    background: rgba(255, 255, 255, 0.02);
+    backdrop-filter: blur(12px);
+  }
+  .pill-nav__link {
+    padding: 10px 12px;
+    border: 1px solid transparent;
+    border-radius: 100px;
+    font-size: 14px;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+    color: var(--white-70);
+    transition: color 0.2s, background-color 0.2s;
+  }
+  .pill-nav__link:hover { color: var(--white); }
+  .pill-nav__link.is-current {
+    font-weight: 500;
+    color: var(--white);
+    border-color: var(--white-10);
+    background: var(--white-05);
+    box-shadow: inset 0 4px 4px rgba(255, 255, 255, 0.15);
+  }
+  .hero__actions { display: flex; gap: 12px; }
+
+  /* Buttons */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    height: 56px;
+    padding: 12px 24px;
+    border: 1px solid transparent;
+    border-radius: 100px;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    transition: transform 0.2s ease, background-color 0.2s, box-shadow 0.2s;
+  }
+  .btn:hover { transform: translateY(-2px); }
+  .btn:active { transform: translateY(0); }
+  .btn:focus-visible, .pill-nav__link:focus-visible { outline: 2px solid var(--gold-100); outline-offset: 2px; }
+  .btn--sm { height: 40px; padding: 12px 16px; font-size: 14px; }
+  .btn--gold { background: var(--gold-100); color: var(--black); }
+  .btn--gold:hover { box-shadow: 0 8px 28px rgba(255, 191, 0, 0.35); }
+  .btn--light { background: var(--white); color: var(--black); }
+  .btn--ghost {
+    background: var(--white-05);
+    border-color: var(--white-10);
+    color: var(--white);
+    backdrop-filter: blur(12px);
+  }
+  .btn--ghost:hover { background: var(--white-10); }
+  .btn__icon { flex-shrink: 0; width: 20px; height: 20px; }
+  span.btn__icon { display: grid; place-items: center; }
+
+  /* Bottom content */
+  .hero__content {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 32px;
+    width: 100%;
+    max-width: 1104px;
+    margin: 0 auto;
+  }
+  .hero__headline {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-width: 640px;
+    font-family: var(--font-display);
+    line-height: 1.2;
+  }
+  .hero__hat { margin: 0; font-size: 16px; color: var(--gold-100); }
+  .hero__title { margin: 0; font-size: clamp(36px, 4.7vw, 56px); font-weight: 400; line-height: 1.2; }
+  .hero__side {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 413px;
+    flex-shrink: 0;
+  }
+  .hero__ctas { display: flex; gap: 12px; }
+  .hero__cta-main { flex: 1; }
+  .hero__desc {
+    margin: 0;
+    font-size: 18px;
+    line-height: 1.5;
+    letter-spacing: -0.01em;
+    color: var(--white-70);
+  }
+
+  @media (max-width: 960px) {
+    .pill-nav { display: none; }
+    .hero__content { flex-direction: column; align-items: stretch; }
+    .hero__side { width: 100%; max-width: 480px; }
+  }
+  @media (max-width: 520px) {
+    .hero__login { display: none; }
+    .hero__ctas { flex-direction: column; }
+    .btn { width: 100%; }
+    .btn--sm { width: auto; }
+    .hero__desc { font-size: 16px; }
+  }
+</style>
+
+<script>
+  import { playHeroIntro } from '../scripts/hero';
+  playHeroIntro();
+</script>

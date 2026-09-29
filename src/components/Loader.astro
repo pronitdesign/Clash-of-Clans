@@ -1,0 +1,134 @@
+---
+import Logo from './Logo.astro';
+
+const steps = [
+  'Preparando o terreno...',
+  'Construindo a Prefeitura...',
+  'Erguendo as defesas...',
+  'Treinando as tropas...',
+  'Reunindo o Clã...',
+  'Preparando a batalha...',
+  'Vila concluída.',
+];
+---
+<div class="loader" id="loader" role="status" aria-live="polite" data-steps={JSON.stringify(steps)}>
+  <video
+    class="loader__video"
+    src="/videos/loading.mp4"
+    autoplay
+    muted
+    playsinline
+    preload="auto"
+    aria-hidden="true"
+  ></video>
+
+  <Logo class="loader__logo" />
+
+  <div class="loader__bottom">
+    <p class="loader__copy"><span class="loader__copy-text">{steps[0]}</span></p>
+    <div class="loader__row">
+      <div
+        class="loader__bar"
+        role="progressbar"
+        aria-label="Carregando o site"
+        aria-valuemin="0"
+        aria-valuemax="100"
+        aria-valuenow="0"
+      >
+        <div class="loader__fill"></div>
+      </div>
+      <span class="loader__pct">0%</span>
+      <span class="loader__icon" aria-hidden="true">
+        <img src="/images/icon-game-loader.svg" alt="" width="40" height="40" />
+      </span>
+    </div>
+  </div>
+</div>
+
+<style>
+  .loader {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    overflow: hidden;
+    background: var(--black);
+  }
+  .loader__video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  :global(.loader__logo) {
+    position: absolute;
+    top: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  .loader__bottom {
+    position: absolute;
+    left: 50%;
+    bottom: clamp(40px, 9vh, 72px);
+    width: min(641px, calc(100% - 2 * var(--gutter)));
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+  .loader__copy {
+    margin: 0;
+    height: 1.2em;
+    overflow: hidden;
+    font-family: var(--font-display);
+    font-size: clamp(24px, 3.4vw, 40px);
+    line-height: 1.2;
+    text-align: center;
+  }
+  .loader__copy-text { display: inline-block; }
+  .loader__row {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+  .loader__bar {
+    flex: 1;
+    height: 24px;
+    border-radius: 100px;
+    background: var(--white-10);
+  }
+  .loader__fill {
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(to left, var(--gold-500), var(--gold-100));
+    clip-path: inset(0 100% 0 0 round 100px);
+  }
+  .loader__pct {
+    min-width: 2.6em;
+    font-family: var(--font-display);
+    font-size: clamp(22px, 2.6vw, 32px);
+    line-height: 1.2;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+  /* The icon hangs outside the centred column, as in the design. */
+  .loader__icon {
+    position: absolute;
+    left: calc(100% + 10px);
+    top: 50%;
+    width: 48px;
+    height: 48px;
+    padding: 4px;
+    transform: translateY(-50%);
+  }
+  .loader__icon img { width: 100%; height: 100%; }
+  @media (max-width: 760px) {
+    .loader__icon { position: static; transform: none; flex-shrink: 0; width: 36px; height: 36px; padding: 3px; }
+  }
+</style>
+
+<script>
+  import { runLoader } from '../scripts/loader';
+  runLoader();
+</script>

@@ -1,0 +1,26 @@
+---
+interface Props { class?: string }
+const { class: className } = Astro.props;
+---
+<span class:list={['logo', className]}>
+  <img src="/images/logo.png" alt="Clash of Clans" width="420" height="194" />
+</span>
+
+<style>
+  /* Figma crops the source image inside a 157×74 frame. */
+  .logo {
+    position: relative;
+    display: block;
+    width: 157px;
+    aspect-ratio: 157 / 74;
+    overflow: hidden;
+  }
+  .logo img {
+    position: absolute;
+    left: -17.85%;
+    top: -9.55%;
+    width: 133.59%;
+    height: 130.9%;
+    max-width: none;
+  }
+</style>

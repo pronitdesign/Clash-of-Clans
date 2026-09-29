@@ -1,0 +1,23 @@
+---
+import '../styles/global.css';
+
+interface Props { title?: string; description?: string }
+const {
+  title = 'Clash of Clans — Construa seu reino',
+  description = 'Erga uma vila imbatível, forme um exército lendário e enfrente jogadores do mundo inteiro.',
+} = Astro.props;
+---
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="preload" href="/fonts/clash-regular.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/aeonik-regular.woff2" as="font" type="font/woff2" crossorigin />
+  </head>
+  <body class="is-loading">
+    <slot />
+  </body>
+</html>

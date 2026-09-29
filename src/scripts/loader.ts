@@ -1,0 +1,103 @@
+import gsap from 'gsap';
+
+// Fallback duration when the loading video can't autoplay or fails to load.
+const FALLBACK_MS = 6000;
+
+export function runLoader() {
+  const root = document.getElementById('loader');
+  if (!root) return;
+
+  const video = root.querySelector<HTMLVideoElement>('.loader__video')!;
+  const fill = root.querySelector<HTMLElement>('.loader__fill')!;
+  const pct = root.querySelector<HTMLElement>('.loader__pct')!;
+  const bar = root.querySelector<HTMLElement>('.loader__bar')!;
+  const copy = root.querySelector<HTMLElement>('.loader__copy-text')!;
+  const steps: string[] = JSON.parse(root.dataset.steps!);
+  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // The site is only "ready" once the page and fonts have loaded, so the bar
+  // never hits 100% before the hero can actually be shown.
+  let siteReady = false;
+  Promise.all([
+    document.readyState === 'complete'
+      ? Promise.resolve()
+      : new Promise((r) => addEventListener('load', r, { once: true })),
+    document.fonts.ready,
+  ]).then(() => (siteReady = true));
+
+  let useFallback = false;
+  const start = performance.now();
+  const enableFallback = () => (useFallback = true);
+  video.addEventListener('error', enableFallback);
+  video.play().catch(enableFallback);
+  // Slow connections: don't leave the bar stuck at 0% while the video buffers.
+  setTimeout(() => { if (video.currentTime === 0) enableFallback(); }, 3000);
+
+  let shown = 0;
+  let stepIndex = 0;
+  let done = false;
+
+  let swap: gsap.core.Timeline | undefined;
+
+  const setStep = (i: number) => {
+    if (i === stepIndex) return;
+    stepIndex = i;
+    if (reduceMotion) {
+      copy.textContent = steps[i];
+      return;
+    }
+    // Steps can change faster than the swap animation; never leave text half-faded.
+    swap?.kill();
+    swap = gsap.timeline()
+      .to(copy, { yPercent: -100, opacity: 0, duration: 0.25, ease: 'power2.in' })
+      .add(() => { copy.textContent = steps[i]; })
+      .fromTo(copy, { yPercent: 100, opacity: 0 }, { yPercent: 0, opacity: 1, duration: 0.35, ease: 'back.out(2)' });
+  };
+
+  const tick = () => {
+    const target = useFallback
+      ? Math.min((performance.now() - start) / FALLBACK_MS, 1)
+      : video.duration ? video.currentTime / video.duration : 0;
+
+    // Hold at 99% until the site has finished loading.
+    const capped = siteReady ? target : Math.min(target, 0.99);
+    shown += (capped - shown) * 0.18;
+    if (capped - shown < 0.001) shown = capped;
+
+    const value = Math.round(shown * 100);
+    fill.style.clipPath = `inset(0 ${100 - shown * 100}% 0 0 round 999px)`;
+    pct.textContent = `${value}%`;
+    bar.setAttribute('aria-valuenow', String(value));
+
+    // Spread the first steps across the load; the last one only shows at 100%.
+    const i = shown >= 1 ? steps.length - 1 : Math.min(Math.floor(shown * (steps.length - 1)), steps.length - 2);
+    setStep(i);
+
+    if (shown >= 1 && !done) {
+      done = true;
+      finish();
+      return;
+    }
+    requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+
+  function finish() {
+    const reveal = () => {
+      root!.remove();
+      document.body.classList.remove('is-loading');
+    };
+    // Signal the hero to start its entrance while the loader fades away.
+    document.dispatchEvent(new CustomEvent('loader:done'));
+
+    if (reduceMotion) {
+      gsap.to(root, { opacity: 0, duration: 0.3, delay: 0.4, onComplete: reveal });
+      return;
+    }
+    gsap.timeline({ delay: 0.6, onComplete: reveal })
+      .to(root!.querySelector('.loader__bottom'), { y: 24, opacity: 0, duration: 0.4, ease: 'power2.in' })
+      .to(root!.querySelector('.loader__logo'), { y: -24, opacity: 0, duration: 0.4, ease: 'power2.in' }, '<')
+      .to(video, { scale: 1.08, duration: 0.9, ease: 'power2.inOut' }, '<')
+      .to(root, { opacity: 0, duration: 0.7, ease: 'power2.out' }, '-=0.5');
+  }
+}

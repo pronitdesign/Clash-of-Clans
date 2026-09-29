@@ -1,7 +1,7 @@
 import gsap from 'gsap';
 
-// Fallback duration when the loading video can't autoplay or fails to load.
-const FALLBACK_MS = 8000;
+// How long the loader lasts. The video is sped up to fit, whatever its length.
+const DURATION_S = 5;
 
 export function runLoader() {
   const root = document.getElementById('loader');
@@ -37,7 +37,14 @@ export function runLoader() {
   const start = performance.now();
   const enableFallback = () => (useFallback = true);
   video.addEventListener('error', enableFallback);
+  const fitDuration = () => { video.playbackRate = Math.max(1, video.duration / DURATION_S); };
+  if (video.readyState >= 1) fitDuration();
+  else video.addEventListener('loadedmetadata', fitDuration, { once: true });
   video.play().catch(enableFallback);
+  // Browsers pause muted video in background tabs; pick up where it left off.
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && video.paused && !done) video.play().catch(() => {});
+  });
   // Slow connections: don't leave the bar stuck at 0% while the video buffers.
   setTimeout(() => { if (video.currentTime === 0) enableFallback(); }, 3000);
 
@@ -64,7 +71,7 @@ export function runLoader() {
 
   const tick = () => {
     const target = useFallback
-      ? Math.min((performance.now() - start) / FALLBACK_MS, 1)
+      ? Math.min((performance.now() - start) / (DURATION_S * 1000), 1)
       : video.duration ? video.currentTime / video.duration : 0;
 
     // Hold at 99% until the site has finished loading.
@@ -102,7 +109,7 @@ export function runLoader() {
       gsap.to(root, { opacity: 0, duration: 0.3, delay: 0.4, onComplete: reveal });
       return;
     }
-    gsap.timeline({ delay: 0.6, onComplete: reveal })
+    gsap.timeline({ delay: 0.3, onComplete: reveal })
       .to(root!.querySelector('.loader__bottom'), { y: 24, opacity: 0, duration: 0.4, ease: 'power2.in' })
       .to(root!.querySelector('.loader__logo'), { y: -24, opacity: 0, duration: 0.4, ease: 'power2.in' }, '<')
       .to(video, { scale: 1.08, duration: 0.9, ease: 'power2.inOut' }, '<')

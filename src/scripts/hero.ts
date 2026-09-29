@@ -18,7 +18,7 @@ export function playHeroIntro() {
       gsap.to(items, { autoAlpha: 1, duration: 0.4, delay: 0.5 });
       return;
     }
-    gsap.timeline({ delay: 0.9 })
+    gsap.timeline({ delay: 0.6 })
       .fromTo(video, { scale: 1.12 }, { scale: 1, duration: 2.2, ease: 'power3.out' }, 0)
       .fromTo(
         items,

@@ -1,7 +1,7 @@
 import gsap from 'gsap';
 
 // Fallback duration when the loading video can't autoplay or fails to load.
-const FALLBACK_MS = 6000;
+const FALLBACK_MS = 8000;
 
 export function runLoader() {
   const root = document.getElementById('loader');

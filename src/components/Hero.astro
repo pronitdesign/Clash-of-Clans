@@ -10,17 +10,15 @@ const links = [
 ];
 ---
 <section class="hero" id="inicio">
-  <!-- Placeholder: swap for the hero's own background video when it's ready. -->
   <video
     class="hero__video"
-    src="/videos/loading.mp4"
+    src="/videos/hero.mp4"
     muted
     loop
     playsinline
-    preload="none"
+    preload="auto"
     aria-hidden="true"
   ></video>
-  <div class="hero__overlay" aria-hidden="true"></div>
 
   <header class="hero__nav" data-hero-in>
     <a href="#inicio" aria-label="Clash of Clans — início"><Logo /></a>
@@ -81,19 +79,10 @@ const links = [
   .hero__video {
     position: absolute;
     inset: 0;
-    z-index: -2;
+    z-index: -1;
     width: 100%;
     height: 100%;
     object-fit: cover;
-  }
-  .hero__overlay {
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    background:
-      linear-gradient(to top, rgba(0, 0, 0, 0.75), transparent 55%),
-      linear-gradient(to bottom, rgba(0, 0, 0, 0.45), transparent 25%),
-      var(--white-05);
   }
 
   /* Nav */

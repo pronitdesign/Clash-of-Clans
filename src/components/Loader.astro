@@ -38,9 +38,6 @@ const steps = [
         <div class="loader__fill"></div>
       </div>
       <span class="loader__pct">0%</span>
-      <span class="loader__icon" aria-hidden="true">
-        <img src="/images/icon-game-loader.svg" alt="" width="40" height="40" />
-      </span>
     </div>
   </div>
 </div>
@@ -111,20 +108,6 @@ const steps = [
     line-height: 1.2;
     text-align: right;
     font-variant-numeric: tabular-nums;
-  }
-  /* The icon hangs outside the centred column, as in the design. */
-  .loader__icon {
-    position: absolute;
-    left: calc(100% + 10px);
-    top: 50%;
-    width: 48px;
-    height: 48px;
-    padding: 4px;
-    transform: translateY(-50%);
-  }
-  .loader__icon img { width: 100%; height: 100%; }
-  @media (max-width: 760px) {
-    .loader__icon { position: static; transform: none; flex-shrink: 0; width: 36px; height: 36px; padding: 3px; }
   }
 </style>
 

@@ -15,14 +15,22 @@ export function runLoader() {
   const steps: string[] = JSON.parse(root.dataset.steps!);
   const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  // The site is only "ready" once the page and fonts have loaded, so the bar
-  // never hits 100% before the hero can actually be shown.
+  // The site is only "ready" once the page, fonts and hero video have loaded,
+  // so the bar never hits 100% before the hero can actually be shown.
+  const heroVideo = document.querySelector<HTMLVideoElement>('.hero__video');
+  const heroVideoReady = new Promise<void>((resolve) => {
+    if (!heroVideo || heroVideo.readyState >= 3) return resolve();
+    heroVideo.addEventListener('canplaythrough', () => resolve(), { once: true });
+    heroVideo.addEventListener('error', () => resolve(), { once: true });
+    setTimeout(resolve, 10000); // never hold the site hostage to a slow video
+  });
   let siteReady = false;
   Promise.all([
     document.readyState === 'complete'
       ? Promise.resolve()
       : new Promise((r) => addEventListener('load', r, { once: true })),
     document.fonts.ready,
+    heroVideoReady,
   ]).then(() => (siteReady = true));
 
   let useFallback = false;

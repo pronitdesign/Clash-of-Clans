@@ -1,0 +1,195 @@
+---
+const cards = [
+  {
+    title: 'Construa sua fortaleza',
+    text: 'Posicione muralhas, torres, canhões e armadilhas para criar uma boa defesa.',
+    video: '/videos/card-fortaleza.mp4',
+  },
+  {
+    title: 'Monte seu exército',
+    text: 'Combine tropas, Heróis, feitiços e Máquinas de Cerco para criar estratégias.',
+    video: '/videos/card-exercito.mp4',
+  },
+  {
+    title: 'Ataque com estratégia',
+    text: 'Estude a vila inimiga, escolha o melhor ponto de entrada e libere suas tropas',
+    video: '/videos/card-ataque.mp4',
+  },
+  {
+    title: 'Lute pelo seu clã e vença o inimigo',
+    text: 'Junte seus amigos, participe das Guerras de Clãs e prove que você pode ganhar.',
+    video: '/videos/card-cla.mp4',
+  },
+];
+---
+<section class="story" id="gameplay">
+  <div class="story__stage" aria-hidden="true">
+    <video
+      class="story__video"
+      data-src="/videos/scroll.mp4"
+      data-src-mobile="/videos/scroll-mobile.mp4"
+      muted
+      playsinline
+      preload="none"
+    ></video>
+  </div>
+
+  <div class="story__inner">
+    <header class="story__header">
+      <p class="story__hat">SUA VILA. SUAS ESTRATÉGIAS.</p>
+      <h2 class="story__title">Cada decisão muda a batalha</h2>
+      <p class="story__desc">
+        Erga uma vila imbatível, forme um exército lendário e enfrente jogadores do mundo inteiro em batalhas épicas. Sua história começa agora, Chefe.
+      </p>
+    </header>
+
+    <ul class="story__cards">
+      {cards.map((card) => (
+        <li class="story-card">
+          <video
+            class="story-card__media"
+            src={card.video}
+            muted
+            loop
+            playsinline
+            preload="metadata"
+            aria-hidden="true"
+          ></video>
+          <div class="story-card__body">
+            <h3 class="story-card__title">{card.title}</h3>
+            <p class="story-card__text">{card.text}</p>
+          </div>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .story {
+    position: relative;
+    background: var(--black);
+  }
+  /* Darkens the video only behind the heading; it scrolls away with the text. */
+  .story::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto;
+    z-index: 1;
+    height: 640px;
+    background: linear-gradient(to bottom, var(--black) 0%, rgba(0, 0, 0, 0.7) 45%, rgba(0, 0, 0, 0) 100%);
+    pointer-events: none;
+  }
+
+  /* Pinned background: stays in the viewport for the whole section while the
+     content scrolls over it. The negative margin keeps it out of the flow. */
+  .story__stage {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+    margin-bottom: -100svh;
+    overflow: hidden;
+  }
+  .story__video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .story__inner {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 80px;
+    max-width: 1105px;
+    margin: 0 auto;
+    padding: 112px var(--gutter);
+    box-sizing: content-box;
+  }
+
+  .story__header {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-width: 665px;
+    text-align: center;
+  }
+  .story__hat,
+  .story__title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 400;
+    line-height: 1.2;
+  }
+  .story__hat { font-size: 16px; color: var(--gold-100); }
+  .story__title { font-size: clamp(40px, 6vw, 72px); }
+  .story__desc {
+    margin: 0;
+    font-size: 20px;
+    line-height: 1.5;
+    letter-spacing: -0.01em;
+    color: var(--white-70);
+  }
+
+  /* Cards zig-zag: odd ones on the left, even ones on the right. */
+  .story__cards {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .story-card {
+    display: flex;
+    flex-direction: column;
+    width: 347px;
+    border: 1px solid var(--white-10);
+    border-radius: 24px;
+    overflow: hidden;
+    will-change: transform, opacity;
+  }
+  .story-card:nth-child(even) { align-self: flex-end; }
+  .story-card__media {
+    width: 100%;
+    height: 420px;
+    object-fit: cover;
+  }
+  .story-card__body {
+    padding: 32px 24px;
+    text-align: center;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+  }
+  .story-card__title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-weight: 400;
+    line-height: 1.2;
+  }
+  .story-card__text {
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.5;
+    letter-spacing: -0.01em;
+    color: var(--white-70);
+  }
+
+  @media (max-width: 768px) {
+    .story__inner { gap: 56px; padding-block: 80px; }
+    .story__desc { font-size: 18px; }
+    .story__cards { align-items: center; gap: 24px; }
+    .story-card:nth-child(even) { align-self: center; }
+    .story-card { width: min(347px, 100%); }
+  }
+</style>
+
+<script>
+  import { initScrollStory } from '../scripts/scrollStory';
+  initScrollStory();
+</script>

@@ -28,6 +28,8 @@
   --white-10: rgba(255, 255, 255, 0.1);
   --white-05: rgba(255, 255, 255, 0.05);
   --gutter: clamp(16px, 4vw, 48px);
+  /* How far the steps section slides up over the scroll video. */
+  --steps-overlap: 100svh;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -50,3 +52,38 @@ a { color: inherit; text-decoration: none; }
   position: absolute; width: 1px; height: 1px; overflow: hidden;
   clip: rect(0 0 0 0); white-space: nowrap;
 }
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 56px;
+  padding: 12px 24px;
+  border: 1px solid transparent;
+  border-radius: 100px;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition: transform 0.2s ease, background-color 0.2s, box-shadow 0.2s;
+}
+.btn:hover { transform: translateY(-2px); }
+.btn:active { transform: translateY(0); }
+.btn:focus-visible { outline: 2px solid var(--gold-100); outline-offset: 2px; }
+.btn--sm { height: 40px; padding: 12px 16px; font-size: 14px; }
+.btn--gold { background: var(--gold-100); color: var(--black); }
+.btn--gold:hover { box-shadow: 0 8px 28px rgba(255, 191, 0, 0.35); }
+.btn--light { background: var(--white); color: var(--black); }
+.btn--ghost {
+  background: var(--white-05);
+  border-color: var(--white-10);
+  color: var(--white);
+  backdrop-filter: blur(12px);
+}
+.btn--ghost:hover { background: var(--white-10); }
+.btn__icon { flex-shrink: 0; width: 20px; height: 20px; }
+span.btn__icon { display: grid; place-items: center; }

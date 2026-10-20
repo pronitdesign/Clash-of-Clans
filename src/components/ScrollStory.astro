@@ -69,6 +69,10 @@ const cards = [
   .story {
     position: relative;
     background: var(--black);
+    /* The stage's negative margin lets it stay pinned for 100svh past the end
+       of the section; clip it so it doesn't cover the next one. Unlike hidden,
+       clip keeps sticky working. */
+    overflow: clip;
   }
   /* Darkens the video only behind the heading; it scrolls away with the text. */
   .story::before {
@@ -103,10 +107,8 @@ const cards = [
     flex-direction: column;
     align-items: center;
     gap: 80px;
-    max-width: 1105px;
-    margin: 0 auto;
-    padding: 112px var(--gutter);
-    box-sizing: content-box;
+    /* Room for the steps section, which slides up over the end of this one. */
+    padding: 112px var(--gutter) calc(112px + var(--steps-overlap));
   }
 
   .story__header {
@@ -139,6 +141,7 @@ const cards = [
     flex-direction: column;
     gap: 4px;
     width: 100%;
+    max-width: 1600px;
     margin: 0;
     padding: 0;
     list-style: none;
@@ -161,7 +164,7 @@ const cards = [
   .story-card__body {
     padding: 32px 24px;
     text-align: center;
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 0.9);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
   }
@@ -181,7 +184,7 @@ const cards = [
   }
 
   @media (max-width: 768px) {
-    .story__inner { gap: 56px; padding-block: 80px; }
+    .story__inner { gap: 56px; padding-block: 80px calc(80px + var(--steps-overlap)); }
     .story__desc { font-size: 18px; }
     .story__cards { align-items: center; gap: 24px; }
     .story-card:nth-child(even) { align-self: center; }

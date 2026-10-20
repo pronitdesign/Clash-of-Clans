@@ -1,0 +1,253 @@
+---
+const steps = [
+  {
+    title: 'Crie sua vila',
+    text: 'Comece com uma pequena aldeia e transforme cada construção em parte de uma fortaleza poderosa.',
+    video: '/videos/step-1.mp4',
+  },
+  {
+    title: 'Treine suas tropas',
+    text: 'Escolha seus guerreiros, evolua suas habilidades e monte um exército pronto para qualquer desafio.',
+    video: '/videos/step-2.mp4',
+  },
+  {
+    title: 'Ataque e evolua',
+    text: 'Invada vilas, conquiste recursos e use cada vitória para tornar seu reino ainda mais poderoso.',
+    video: '/videos/step-3.mp4',
+  },
+];
+---
+<section class="steps" id="como-jogar">
+  <img class="steps__bg" src="/images/steps-bg.webp" alt="" width="1800" height="3068" loading="lazy" decoding="async" />
+
+  <header class="steps__header">
+    <div class="steps__headline">
+      <p class="steps__hat">DE RECRUTA A LENDA</p>
+      <h2 class="steps__title">Três passos para a glória da batalha</h2>
+    </div>
+
+    <div class="steps__side">
+      <p class="steps__desc">Começar é fácil. Dominar o campo de batalha é outra história.</p>
+      <div class="steps__ctas">
+        <a class="btn btn--gold steps__cta-main" href="#download">
+          Jogar grátis
+          <span class="btn__icon"><img src="/images/icon-game.svg" alt="" width="16.6667" height="16.6667" /></span>
+        </a>
+        <a class="btn btn--ghost" href="#trailer">
+          Assistir ao trailer
+          <img class="btn__icon" src="/images/icon-play.svg" alt="" width="20" height="20" />
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <ol class="steps__cards">
+    {steps.map((step, i) => (
+      <li class="step-card" style={`--i: ${i}`}>
+        <div class="step-card__body">
+          <div class="step-card__copy">
+            <p class="step-card__label">Etapa {i + 1}</p>
+            <h3 class="step-card__title">{step.title}</h3>
+            <p class="step-card__text">{step.text}</p>
+          </div>
+          <a class="btn btn--ghost" href="#trailer">
+            Assistir ao trailer
+            <img class="btn__icon" src="/images/icon-play.svg" alt="" width="20" height="20" />
+          </a>
+        </div>
+
+        <div class="step-card__media">
+          {step.video && (
+            <video src={step.video} muted loop playsinline preload="metadata" aria-hidden="true"></video>
+          )}
+        </div>
+      </li>
+    ))}
+  </ol>
+</section>
+
+<style>
+  /* Rounded top that overlaps the end of the previous section, so it reads as
+     a card sliding in over the scroll video. */
+  .steps {
+    position: relative;
+    z-index: 3;
+    margin-top: calc(var(--steps-overlap) * -1);
+    /* The script scales the section up from a smaller card and scrubs the
+       corner radius down to 0 as it scrolls in. */
+    --radius: 96px;
+    clip-path: inset(0 round var(--radius) var(--radius) 0 0);
+    transform-origin: 50% 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 64px;
+    padding: 112px var(--gutter);
+    background: var(--black);
+    /* Keeps the background inside the rounded corners; clip, unlike hidden,
+       doesn't break the sticky cards. */
+    overflow: clip;
+  }
+  .steps__bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center bottom;
+    pointer-events: none;
+  }
+  /* Fades the background into the black of the next section. */
+  .steps::after {
+    content: '';
+    position: absolute;
+    inset: auto 0 0;
+    height: 160px;
+    background: linear-gradient(transparent, var(--black));
+    pointer-events: none;
+  }
+  .steps__header,
+  .steps__cards { position: relative; z-index: 1; }
+
+  .steps__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 32px;
+    width: 100%;
+    max-width: 1104px;
+  }
+  .steps__headline {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-width: 640px;
+    font-family: var(--font-display);
+    line-height: 1.2;
+  }
+  .steps__hat { margin: 0; font-size: 16px; color: var(--gold-100); }
+  .steps__title { margin: 0; max-width: 623px; font-size: clamp(36px, 4.7vw, 56px); font-weight: 400; line-height: 1.2; }
+  .steps__side {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 413px;
+    flex-shrink: 0;
+  }
+  .steps__ctas { display: flex; gap: 12px; }
+  .steps__cta-main { flex: 1; }
+  .steps__desc {
+    margin: 0;
+    max-width: 360px;
+    font-size: 24px;
+    line-height: 1.5;
+    letter-spacing: -0.01em;
+    color: var(--white-70);
+  }
+
+  /* Stacking cards: each one sticks a little lower than the previous, so the
+     top edge of the cards underneath stays visible. The script shrinks a card
+     as the next one slides over it. */
+  .steps__cards {
+    --stick: 96px;
+    --step: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+    max-width: 1104px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .step-card {
+    position: sticky;
+    top: calc(var(--stick) + var(--i) * var(--step));
+    display: flex;
+    gap: 32px;
+    height: 520px;
+    padding: 48px 24px;
+    border: 1px solid var(--white-10);
+    border-radius: 24px;
+    /* Translucent with a blur, so the background shows through as the cards
+       slide over it and the card underneath stays blurred out. */
+    background: rgba(19, 6, 34, 0.6);
+    backdrop-filter: blur(24px) saturate(140%);
+    -webkit-backdrop-filter: blur(24px) saturate(140%);
+    transform-origin: 50% 0;
+    will-change: transform;
+  }
+  /* Shade that fades in as the card gets covered; driven by --shade. */
+  .step-card::after {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    background: var(--black);
+    opacity: var(--shade, 0);
+    pointer-events: none;
+  }
+  .step-card__body {
+    display: flex;
+    flex: 1 1 0;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 32px;
+    min-width: 0;
+  }
+  .step-card__copy { display: flex; flex-direction: column; gap: 16px; }
+  .step-card__label,
+  .step-card__title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 400;
+    line-height: 1.2;
+  }
+  .step-card__label { font-size: 16px; color: var(--gold-100); }
+  .step-card__title { font-size: 28px; }
+  .step-card__text {
+    margin: 0;
+    font-size: 20px;
+    line-height: 1.5;
+    letter-spacing: -0.01em;
+    color: var(--white-70);
+  }
+  .step-card__media {
+    flex: 1 1 0;
+    min-width: 0;
+    margin-block: -24px;
+    border-radius: 24px;
+    overflow: hidden;
+    background: var(--white-05);
+  }
+  .step-card__media video { width: 100%; height: 100%; object-fit: cover; }
+
+  @media (max-width: 960px) {
+    .steps__header { flex-direction: column; align-items: stretch; }
+    .steps__side { width: 100%; max-width: 480px; }
+    .steps__desc { font-size: 20px; }
+  }
+  @media (max-width: 768px) {
+    .steps { --radius: 48px; gap: 48px; padding-block: 80px; }
+    .steps__cards { --stick: 72px; --step: 12px; }
+    .step-card {
+      flex-direction: column-reverse;
+      gap: 24px;
+      height: auto;
+      padding: 16px 16px 24px;
+    }
+    .step-card__media { flex: none; height: 220px; margin: 0; border-radius: 16px; }
+    .step-card__text { font-size: 18px; }
+  }
+  @media (max-width: 520px) {
+    .steps__ctas { flex-direction: column; }
+    .steps .btn { width: 100%; }
+    .steps__desc { font-size: 18px; }
+  }
+</style>
+
+<script>
+  import { initSteps } from '../scripts/steps';
+  initSteps();
+</script>

@@ -6,6 +6,8 @@ const {
   title = 'Clash of Clans — Construa seu reino',
   description = 'Erga uma vila imbatível, forme um exército lendário e enfrente jogadores do mundo inteiro.',
 } = Astro.props;
+// Social networks need an absolute URL; set `site` in astro.config to the real domain.
+const ogImage = new URL('/og-image.jpg', Astro.site ?? Astro.url).href;
 ---
 <!doctype html>
 <html lang="pt-BR">
@@ -14,6 +16,22 @@ const {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="icon" type="image/png" sizes="512x512" href="/favicon-512.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="theme-color" content="#000000" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content="pt_BR" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
     <link rel="preload" href="/fonts/clash-regular.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/fonts/aeonik-regular.woff2" as="font" type="font/woff2" crossorigin />
   </head>

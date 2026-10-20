@@ -5,7 +5,7 @@ const links = [
   { label: 'Home', href: '#inicio', current: true },
   { label: 'O Jogo', href: '#gameplay' },
   { label: 'Como Jogar', href: '#como-jogar' },
-  { label: 'Heróis', href: '#herois' },
+  { label: 'Heróis', href: '#personagens' },
   { label: 'FAQ', href: '#faq' },
 ];
 ---
@@ -48,6 +48,9 @@ const links = [
     </div>
 
     <div class="hero__side">
+      <p class="hero__desc" data-hero-in>
+        Erga uma vila imbatível, forme um exército lendário e enfrente jogadores do mundo inteiro em batalhas épicas. Sua história começa agora, Chefe.
+      </p>
       <div class="hero__ctas" data-hero-in>
         <a class="btn btn--gold hero__cta-main" href="#download">
           Jogar grátis
@@ -58,9 +61,6 @@ const links = [
           <img class="btn__icon" src="/images/icon-play.svg" alt="" width="20" height="20" />
         </a>
       </div>
-      <p class="hero__desc" data-hero-in>
-        Erga uma vila imbatível, forme um exército lendário e enfrente jogadores do mundo inteiro em batalhas épicas. Sua história começa agora, Chefe.
-      </p>
     </div>
   </div>
 </section>
@@ -83,6 +83,16 @@ const links = [
     width: 100%;
     height: 100%;
     object-fit: cover;
+  }
+  /* Fades the bottom of the video into the black of the next section. */
+  .hero::after {
+    content: '';
+    position: absolute;
+    inset: auto 0 0;
+    z-index: -1;
+    height: 45%;
+    background: linear-gradient(to top, var(--black) 0%, rgba(0, 0, 0, 0.6) 45%, rgba(0, 0, 0, 0) 100%);
+    pointer-events: none;
   }
 
   /* Nav */
@@ -125,40 +135,7 @@ const links = [
   }
   .hero__actions { display: flex; gap: 12px; }
 
-  /* Buttons */
-  .btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    height: 56px;
-    padding: 12px 24px;
-    border: 1px solid transparent;
-    border-radius: 100px;
-    font-size: 16px;
-    font-weight: 500;
-    line-height: 1;
-    letter-spacing: -0.01em;
-    text-transform: uppercase;
-    white-space: nowrap;
-    transition: transform 0.2s ease, background-color 0.2s, box-shadow 0.2s;
-  }
-  .btn:hover { transform: translateY(-2px); }
-  .btn:active { transform: translateY(0); }
-  .btn:focus-visible, .pill-nav__link:focus-visible { outline: 2px solid var(--gold-100); outline-offset: 2px; }
-  .btn--sm { height: 40px; padding: 12px 16px; font-size: 14px; }
-  .btn--gold { background: var(--gold-100); color: var(--black); }
-  .btn--gold:hover { box-shadow: 0 8px 28px rgba(255, 191, 0, 0.35); }
-  .btn--light { background: var(--white); color: var(--black); }
-  .btn--ghost {
-    background: var(--white-05);
-    border-color: var(--white-10);
-    color: var(--white);
-    backdrop-filter: blur(12px);
-  }
-  .btn--ghost:hover { background: var(--white-10); }
-  .btn__icon { flex-shrink: 0; width: 20px; height: 20px; }
-  span.btn__icon { display: grid; place-items: center; }
+  .pill-nav__link:focus-visible { outline: 2px solid var(--gold-100); outline-offset: 2px; }
 
   /* Bottom content */
   .hero__content {

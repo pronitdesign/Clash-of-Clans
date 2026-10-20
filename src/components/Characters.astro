@@ -1,0 +1,475 @@
+---
+// Stats go from 0 to 100. `color` drives the glow, bars and particle effects.
+const characters = [
+  {
+    id: 'barbaro',
+    name: 'Bárbaro',
+    category: 'LINHA DE FRENTE',
+    title: 'A coragem chega primeiro.',
+    text: 'Espada em mãos e medo nenhum. O Bárbaro avança diretamente contra muralhas, construções e qualquer inimigo que tente interromper seu caminho.',
+    skill: 'Ataque rápido corpo a corpo',
+    color: '#ffbf00',
+    stats: { Força: 72, Destreza: 78, Resistência: 64, Alcance: 15 },
+  },
+  {
+    id: 'arqueira',
+    name: 'Arqueira',
+    category: 'ATAQUE À DISTÂNCIA',
+    title: 'Ela acerta antes de ser vista.',
+    text: 'Rápida, silenciosa e precisa. A Arqueira encontra o ponto fraco da defesa e dispara antes que o inimigo tenha tempo de reagir.',
+    skill: 'Precisão à distância',
+    color: '#7ee35a',
+    stats: { Força: 48, Destreza: 95, Resistência: 36, Alcance: 92 },
+  },
+  {
+    id: 'esqueleto',
+    name: 'Esqueleto Gigante',
+    category: 'DEMOLIÇÃO',
+    title: 'O perigo continua depois da queda.',
+    text: 'Ele pode até parecer divertido, mas ninguém quer estar por perto quando sua enorme bomba começa a acender. Quanto mais perto das defesas, maior o estrago.',
+    skill: 'Explosão em área',
+    color: '#ff7a1a',
+    stats: { Força: 90, Destreza: 28, Resistência: 72, Alcance: 30 },
+  },
+  {
+    id: 'pekka',
+    name: 'P.E.K.K.A',
+    category: 'FORÇA BLINDADA',
+    title: 'Um golpe pode decidir a batalha.',
+    text: 'Sob uma armadura impenetrável existe uma força difícil de deter. P.E.K.K.A atravessa o campo de batalha com golpes pesados e poder devastador.',
+    skill: 'Dano pesado corpo a corpo',
+    color: '#a65cff',
+    stats: { Força: 100, Destreza: 24, Resistência: 96, Alcance: 18 },
+  },
+];
+
+const pad = (n: number) => String(n).padStart(2, '0');
+const config = characters.map(({ id, color }) => ({ id, color, model: `/models/${id}.glb` }));
+---
+<section
+  class="chars"
+  id="personagens"
+  style={`--char: ${characters[0].color}`}
+  data-characters={JSON.stringify(config)}
+>
+  <p class="chars__watermark" aria-hidden="true">{characters[0].name}</p>
+  <canvas class="chars__canvas" tabindex="0" aria-label="Modelo 3D do personagem selecionado. Pressione Enter para atacar."></canvas>
+
+  <div class="chars__layout">
+    <header class="chars__intro">
+      <p class="chars__hat">ENTRE NO CAMPO DE BATALHA</p>
+      <h2 class="chars__title">Quatro ícones. Quatro formas de dominar.</h2>
+      <p class="chars__desc">
+        Conheça de perto alguns dos personagens mais marcantes de Clash of Clans. Selecione um guerreiro, explore cada detalhe em 360° e descubra como ele reage aos seus movimentos.
+      </p>
+    </header>
+
+    <!-- Empty box the 3D model is framed into. -->
+    <div class="chars__focus" aria-hidden="true"></div>
+
+    <div class="chars__info">
+      {characters.map((char, i) => (
+        <article
+          class="char-info"
+          id={`char-panel-${char.id}`}
+          role="tabpanel"
+          aria-labelledby={`char-tab-${char.id}`}
+          data-char={char.id}
+          hidden={i !== 0}
+        >
+          <p class="char-info__category" data-reveal>{char.category}</p>
+          <h3 class="char-info__name" data-reveal>{char.name}</h3>
+          <p class="char-info__title" data-reveal>{char.title}</p>
+          <p class="char-info__text" data-reveal>{char.text}</p>
+          <p class="char-info__skill" data-reveal>
+            <span>Habilidade</span>
+            {char.skill}
+          </p>
+          <ul class="char-info__stats">
+            {Object.entries(char.stats).map(([label, value]) => (
+              <li class="stat" data-reveal>
+                <span class="stat__label">{label}</span>
+                <span class="stat__value">{value}</span>
+                <span class="stat__track"><span class="stat__fill" style={`--value: ${value / 100}`}></span></span>
+              </li>
+            ))}
+          </ul>
+        </article>
+      ))}
+    </div>
+
+    <p class="chars__hint">
+      <span>Arraste para girar</span><span class="chars__hint-hover">Passe o cursor para interagir</span><span>Clique para atacar</span>
+    </p>
+
+    <div class="chars__bottom">
+      <p class="chars__quote">Cada batalha exige uma estratégia. Cada estratégia começa com a escolha certa.</p>
+
+      <div class="chars__picker" role="tablist" aria-label="Escolha seu guerreiro">
+        {characters.map((char, i) => (
+          <button
+            class="char-tab"
+            id={`char-tab-${char.id}`}
+            type="button"
+            role="tab"
+            aria-selected={i === 0 ? 'true' : 'false'}
+            aria-controls={`char-panel-${char.id}`}
+            tabindex={i === 0 ? 0 : -1}
+            data-char={char.id}
+            data-name={char.name}
+            style={`--char: ${char.color}`}
+          >
+            <img src={`/images/char-${char.id}.webp`} alt="" width="560" height="700" loading="lazy" decoding="async" />
+            <span class="char-tab__name">{char.name}</span>
+          </button>
+        ))}
+      </div>
+
+      <p class="chars__index">
+        PERSONAGEM <span class="chars__index-current">01</span> / {pad(characters.length)}
+      </p>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* Registered so the background glow can transition between characters. */
+  @property --char { syntax: '<color>'; inherits: true; initial-value: #ffbf00; }
+
+  .chars {
+    --pulse: 0;
+    position: relative;
+    height: 100svh;
+    min-height: 760px;
+    overflow: clip;
+    isolation: isolate;
+    background:
+      radial-gradient(ellipse 50% 60% at 50% 58%, color-mix(in srgb, var(--char) calc(22% + var(--pulse) * 30%), transparent) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 10% at 50% 82%, color-mix(in srgb, var(--char) 18%, transparent) 0%, transparent 100%),
+      var(--black);
+    transition: --char 0.6s;
+  }
+  /* Fades into the neighbouring sections. */
+  .chars::before,
+  .chars::after {
+    content: '';
+    position: absolute;
+    inset-inline: 0;
+    z-index: -1;
+    height: 160px;
+    pointer-events: none;
+  }
+  .chars::before { top: 0; background: linear-gradient(var(--black), transparent); }
+  .chars::after { bottom: 0; background: linear-gradient(transparent, var(--black)); }
+
+  .chars__watermark {
+    position: absolute;
+    top: 46%;
+    left: 50%;
+    z-index: -1;
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(120px, 17vw, 300px);
+    line-height: 1;
+    white-space: nowrap;
+    text-transform: uppercase;
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(255, 255, 255, 0.07);
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .chars__canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    outline: none;
+    touch-action: pan-y;
+  }
+  .chars__canvas.is-hover { cursor: pointer; }
+  .chars__canvas.is-dragging { cursor: grabbing; }
+
+  /* The layout sits over the canvas but lets pointer events through, so the
+     model can be dragged anywhere that isn't text or a control. */
+  .chars__layout {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: minmax(0, 340px) minmax(0, 1fr) minmax(0, 380px);
+    grid-template-rows: minmax(0, 1fr) auto auto;
+    grid-template-areas:
+      'intro focus info'
+      'hint hint hint'
+      'bottom bottom bottom';
+    column-gap: 32px;
+    height: 100%;
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 112px var(--gutter) 40px;
+    pointer-events: none;
+  }
+  .chars__layout :is(a, button, [role='tablist']) { pointer-events: auto; }
+
+  .chars__intro { grid-area: intro; display: flex; flex-direction: column; gap: 12px; }
+  .chars__hat,
+  .chars__title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 400;
+    line-height: 1.2;
+  }
+  .chars__hat { font-size: 16px; color: var(--gold-100); }
+  .chars__title { font-size: clamp(28px, 2.6vw, 38px); }
+  .chars__desc {
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.5;
+    letter-spacing: -0.01em;
+    color: var(--white-70);
+  }
+
+  .chars__focus { grid-area: focus; min-height: 0; }
+
+  /* Info panel */
+  .chars__info { grid-area: info; align-self: center; display: grid; }
+  .char-info { grid-area: 1 / 1; display: flex; flex-direction: column; gap: 12px; }
+  .char-info[hidden] { display: none; }
+  .char-info__category {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 14px;
+    letter-spacing: 0.08em;
+    color: var(--char);
+  }
+  .char-info__category::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--char);
+    box-shadow: 0 0 12px var(--char);
+  }
+  .char-info__name {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(48px, 5vw, 76px);
+    font-weight: 400;
+    line-height: 0.95;
+    text-transform: uppercase;
+    color: var(--gold-100);
+    text-shadow: 0 4px 32px color-mix(in srgb, var(--char) 40%, transparent);
+  }
+  .char-info__title {
+    margin: 4px 0 0;
+    font-family: var(--font-display);
+    font-size: 22px;
+    line-height: 1.2;
+  }
+  .char-info__text {
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.5;
+    letter-spacing: -0.01em;
+    color: var(--white-70);
+  }
+  .char-info__skill {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin: 8px 0 4px;
+    padding: 12px 16px;
+    border: 1px solid var(--white-10);
+    border-radius: 16px;
+    background: var(--white-05);
+    backdrop-filter: blur(12px);
+    font-size: 16px;
+    font-weight: 500;
+  }
+  .char-info__skill span {
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--white-70);
+  }
+  .char-info__stats {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .stat {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 6px;
+    font-size: 13px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .stat__label { color: var(--white-70); }
+  .stat__value { font-family: var(--font-display); letter-spacing: 0; }
+  .stat__track {
+    grid-column: 1 / -1;
+    height: 6px;
+    border-radius: 100px;
+    background: var(--white-10);
+    overflow: hidden;
+  }
+  .stat__fill {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, color-mix(in srgb, var(--char) 55%, transparent), var(--char));
+    box-shadow: 0 0 12px var(--char);
+    transform: scaleX(var(--value));
+    transform-origin: left;
+  }
+
+  .chars__hint {
+    grid-area: hint;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 4px 12px;
+    margin: 0 0 20px;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--white-70);
+  }
+  .chars__hint span + span::before { content: '·'; margin-right: 12px; color: var(--gold-100); }
+  /* Touch screens can't hover. */
+  @media (hover: none) { .chars__hint-hover { display: none; } }
+
+  /* Bottom row: quote, picker, index */
+  .chars__bottom {
+    grid-area: bottom;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: end;
+    gap: 32px;
+  }
+  .chars__quote,
+  .chars__index {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--white-70);
+  }
+  .chars__quote { max-width: 280px; }
+  .chars__index {
+    justify-self: end;
+    font-family: var(--font-display);
+    letter-spacing: 0.08em;
+  }
+  .chars__index-current { color: var(--gold-100); }
+
+  .chars__picker { display: flex; gap: 12px; }
+  .char-tab {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    width: 128px;
+    aspect-ratio: 4 / 5;
+    padding: 0;
+    border: 1px solid var(--white-10);
+    border-radius: 16px;
+    overflow: hidden;
+    background:
+      radial-gradient(ellipse 90% 70% at 50% 100%, color-mix(in srgb, var(--char) 35%, transparent), transparent 70%),
+      #0d0d0d;
+    color: var(--white);
+    cursor: pointer;
+    transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.3s, box-shadow 0.3s;
+  }
+  .char-tab img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: saturate(0.6) brightness(0.7);
+    transition: filter 0.3s, transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  .char-tab::after {
+    content: '';
+    position: absolute;
+    inset: 40% 0 0;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.85));
+  }
+  .char-tab__name {
+    position: relative;
+    z-index: 1;
+    padding: 0 8px 12px;
+    font-family: var(--font-display);
+    font-size: 14px;
+    line-height: 1.1;
+    text-align: center;
+  }
+  .char-tab:hover { transform: translateY(-4px); }
+  .char-tab:hover img { filter: none; transform: scale(1.05); }
+  .char-tab:focus-visible { outline: 2px solid var(--gold-100); outline-offset: 3px; }
+  .char-tab[aria-selected='true'] {
+    border-color: var(--char);
+    box-shadow: 0 0 0 1px var(--char), 0 12px 40px color-mix(in srgb, var(--char) 35%, transparent);
+    transform: translateY(-8px);
+  }
+  .char-tab[aria-selected='true'] img { filter: none; }
+
+  @media (max-width: 1100px) {
+    .chars__layout { grid-template-columns: minmax(0, 300px) minmax(0, 1fr) minmax(0, 340px); }
+    .char-tab { width: 104px; }
+  }
+
+  /* Stacked layout: the section grows past one screen and the model gets its
+     own block in the flow. */
+  @media (max-width: 860px) {
+    .chars { height: auto; min-height: 0; }
+    .chars__watermark { display: none; }
+    .chars__layout {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-rows: auto;
+      grid-template-areas: 'intro' 'focus' 'hint' 'bottom' 'info';
+      row-gap: 24px;
+      padding-block: 80px;
+    }
+    .chars__focus { height: 60svh; min-height: 380px; }
+    .chars__hint { margin: -16px 0 0; }
+    .chars__bottom { grid-template-columns: 1fr; justify-items: center; gap: 16px; }
+    .chars {
+      background:
+        radial-gradient(ellipse 90% 30% at 50% 28%, color-mix(in srgb, var(--char) calc(22% + var(--pulse) * 30%), transparent) 0%, transparent 70%),
+        var(--black);
+    }
+    .chars__picker { width: 100%; gap: 8px; }
+    .char-tab { flex: 1 1 0; width: auto; min-width: 0; }
+    .char-tab__name { font-size: 11px; padding-bottom: 8px; }
+    .chars__quote { order: 3; max-width: none; text-align: center; }
+    .chars__index { justify-self: center; }
+    .chars__info { margin-top: 16px; }
+  }
+</style>
+
+<script>
+  // three.js is heavy, so the 3D code is only fetched as the section approaches.
+  // The loader's event may fire before the import lands, so remember it here.
+  const loaderDone = new Promise<void>((resolve) => {
+    if (!document.getElementById('loader')) resolve();
+    else document.addEventListener('loader:done', () => resolve(), { once: true });
+  });
+  const section = document.getElementById('personagens')!;
+  const observer = new IntersectionObserver(([entry]) => {
+    if (!entry.isIntersecting) return;
+    observer.disconnect();
+    import('../scripts/characters').then((m) => m.initCharacters(loaderDone));
+  }, { rootMargin: '150% 0px' });
+  observer.observe(section);
+</script>

@@ -125,8 +125,8 @@ export function runLoader() {
     swap = gsap.timeline();
     if (old.length) {
       swap.to(old, {
-        rotationX: 90, y: -18, opacity: 0,
-        duration: 0.22, ease: 'power2.in', stagger: { each: 0.012, from: 'start' },
+        yPercent: -35, opacity: 0,
+        duration: 0.3, ease: 'power2.in', stagger: { each: 0.008, from: 'start' },
       });
     }
     swap.add(() => {
@@ -134,12 +134,13 @@ export function runLoader() {
       copy.classList.toggle('is-final', final);
       if (final) {
         gsap.fromTo(chars,
-          { scale: 0, rotationZ: () => gsap.utils.random(-40, 40), y: 30, opacity: 0 },
-          { scale: 1, rotationZ: 0, y: 0, opacity: 1, duration: 0.7, ease: 'elastic.out(1, 0.5)', stagger: 0.03 });
+          { scale: 0.6, yPercent: 40, opacity: 0 },
+          { scale: 1, yPercent: 0, opacity: 1, duration: 0.7, ease: 'back.out(1.6)', stagger: 0.025 });
       } else {
+        // A gentle rise with a slight tilt, so letters settle instead of flipping.
         gsap.fromTo(chars,
-          { rotationX: -100, y: 24, opacity: 0 },
-          { rotationX: 0, y: 0, opacity: 1, duration: 0.55, ease: 'back.out(2.2)', stagger: 0.022 });
+          { rotationX: -35, yPercent: 50, opacity: 0 },
+          { rotationX: 0, yPercent: 0, opacity: 1, duration: 0.7, ease: 'power3.out', stagger: 0.018 });
       }
     });
 
